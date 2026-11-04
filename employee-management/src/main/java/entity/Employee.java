@@ -5,11 +5,8 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(
-        name = "employees",
-        uniqueConstraints = @UniqueConstraint(
-                name = "uk_employee_email",
-                columnNames = "email"
-        )
+        name = "employees"
+
 )
 public class Employee {
 
