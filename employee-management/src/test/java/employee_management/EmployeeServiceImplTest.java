@@ -4,6 +4,7 @@ import com.example.employeemanagement.dto.EmployeeRequest;
 import com.example.employeemanagement.entity.Employee;
 import com.example.employeemanagement.repository.EmployeeRepository;
 import com.example.employeemanagement.service.EmployeeServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -34,6 +35,10 @@ class EmployeeServiceImplTest {
 
         assertEquals("Jane", result.getFirstName());
         assertEquals("jane@example.com", result.getEmail());
+    }
+    @BeforeEach
+    void setUp() {
+        System.out.println("ACHBCJS");
     }
 
     @Test

@@ -8,12 +8,10 @@ import com.example.employeemanagement.exception.EmployeeNotFoundException;
 import com.example.employeemanagement.repository.EmployeeRepository;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
-@Transactional
 public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
@@ -60,7 +58,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     // READ ALL
     @Override
-    @Transactional(readOnly = true)
     public List<EmployeeResponse> getAllEmployees() {
 
         return employeeRepository.findAll()
@@ -71,7 +68,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     // READ ONE
     @Override
-    @Transactional(readOnly = true)
     public EmployeeResponse getEmployeeById(Long id) {
 
         Employee employee = employeeRepository.findById(id)

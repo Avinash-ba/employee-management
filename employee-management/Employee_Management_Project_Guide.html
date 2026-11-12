@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Employee Management - Easy Project Guide</title>
+<style>
+@page { size: A4; margin: 16mm; @bottom-right { content: "Page " counter(page); color: #64748b; font: 9pt Arial; } }
+* { box-sizing: border-box; }
+body { font: 10.3pt/1.48 Arial, Helvetica, sans-serif; color: #172033; margin: 0; }
+h1 { color: #123b62; font-size: 25pt; line-height: 1.18; margin: 0 0 10pt; }
+h2 { color: #145783; font-size: 17pt; margin: 0 0 10pt; padding-bottom: 5pt; border-bottom: 2px solid #b7d4e8; }
+h3 { color: #174f70; font-size: 12pt; margin: 13pt 0 4pt; }
+p { margin: 4pt 0 8pt; }
+ul, ol { margin: 5pt 0 9pt; padding-left: 20pt; }
+li { margin: 2pt 0; }
+.page { page-break-after: always; break-after: page; }
+.page:last-child { page-break-after: auto; break-after: auto; }
+.eyebrow { color: #2c789c; font-size: 9pt; font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8pt; }
+.lead { font-size: 13pt; color: #40546b; }
+.callout { background: #eef6fb; border-left: 4px solid #3183a7; padding: 9pt 11pt; margin: 10pt 0; }
+.note { background: #fff7e8; border-left: 4px solid #e3a635; padding: 8pt 10pt; margin: 8pt 0; }
+.card { border: 1px solid #d7e1eb; padding: 8pt 10pt; margin: 7pt 0; }
+code, pre { font-family: Consolas, 'Courier New', monospace; color: #15334b; }
+code { background: #edf2f7; padding: 1pt 3pt; font-size: 9.4pt; }
+pre { background: #f2f5f8; border: 1px solid #dce4eb; padding: 8pt; font-size: 8.7pt; line-height: 1.38; white-space: pre-wrap; word-break: break-word; margin: 7pt 0; }
+table { border-collapse: collapse; width: 100%; margin: 8pt 0; font-size: 9.3pt; }
+th { text-align: left; background: #e8f1f7; color: #173e5c; }
+th, td { border: 1px solid #cfdae4; padding: 5pt 7pt; vertical-align: top; }
+.small { color: #5a6b7d; font-size: 9pt; }
+.file { color: #183f5c; font-family: Consolas, 'Courier New', monospace; font-size: 9pt; }
+</style>
+</head>
+<body>
+<section class="page">
+<div class="eyebrow">Beginner-friendly guide</div>
+<h1>Employee Management Project</h1>
+<p class="lead">A simple, file-by-file guide to what the application does and how its parts work together.</p>
+<div class="callout"><b>In one sentence:</b> This is a Spring Boot REST API that lets a client such as Postman create, list, view, update, and delete employee records stored in a MySQL database.</div>
+<h2>How a request travels through the app</h2>
+<div class="card"><b>Postman / client</b> sends a URL, HTTP method, and possibly JSON<br>↓<br><b>EmployeeController</b> receives the request<br>↓<br><b>EmployeeRequest</b> checks that input is valid<br>↓<br><b>EmployeeServiceImpl</b> applies the employee rules<br>↓<br><b>EmployeeRepository</b> reads or writes data<br>↓<br><b>MySQL</b> stores the employee row</div>
+<p>The result travels back in reverse: the service turns a database <b>Employee</b> into an <b>EmployeeResponse</b>, and the controller returns it as JSON. If input or business rules fail, <b>GlobalExceptionHandler</b> turns the error into a readable HTTP response.</p>
+<h2>Project folders at a glance</h2>
+<table><tr><th>Location</th><th>What is inside</th></tr>
+<tr><td><code>src/main/java</code></td><td>Application code: API controller, DTOs, service, repository, entity, and exceptions.</td></tr>
+<tr><td><code>src/main/resources</code></td><td>Application settings, including database connection and server port.</td></tr>
+<tr><td><code>src/test/java</code></td><td>Automated test source files.</td></tr>
+<tr><td><code>.mvn</code>, <code>mvnw</code>, <code>mvnw.cmd</code></td><td>Maven Wrapper files for running Maven without installing it separately.</td></tr>
+<tr><td><code>target</code></td><td>Generated build output. Maven creates it; do not edit its contents by hand.</td></tr></table>
+<div class="note"><b>Package note:</b> Java package names are declared inside each source file, for example <code>com.example.employeemanagement.controller</code>. The package declaration determines the Java package even if directory names look shorter.</div>
+<p class="small">This guide covers all application files in the Maven project folder. IDE settings and generated build output are not application source.</p>
+</section>
+
+<section class="page">
+<div class="eyebrow">Using the API</div><h2>Endpoints and Postman examples</h2>
+<table><tr><th>Method</th><th>URL</th><th>What it does</th><th>Usual success</th></tr>
+<tr><td>POST</td><td><code>/api/employees</code></td><td>Create an employee</td><td>201 Created</td></tr>
+<tr><td>GET</td><td><code>/api/employees</code></td><td>Get all employees</td><td>200 OK</td></tr>
+<tr><td>GET</td><td><code>/api/employees/{id}</code></td><td>Get one employee by ID</td><td>200 OK</td></tr>
+<tr><td>PUT</td><td><code>/api/employees/{id}</code></td><td>Replace an employee's details</td><td>200 OK</td></tr>
+<tr><td>DELETE</td><td><code>/api/employees/{id}</code></td><td>Delete an employee</td><td>204 No Content</td></tr></table>
+<h3>Create an employee</h3><p>In Postman select <b>POST</b>, enter <code>http://localhost:8080/api/employees</code>, choose <b>Body → raw → JSON</b>, and send:</p>
+<pre>{
+  "firstName": "Asha",
+  "lastName": "Rao",
+  "email": "asha@example.com",
+  "department": "Engineering",
+  "salary": 65000.00
+}</pre>
+<p>All five fields are required. Email must look like an email address, and salary must be greater than zero.</p>
+<h3>What if first name is missing?</h3>
+<p>The controller uses <code>@Valid</code>, so Spring checks the rules before calling the service. Missing first name returns HTTP <b>400 Bad Request</b> and a body similar to:</p>
+<pre>{
+  "status": 400,
+  "error": "Validation Failed",
+  "message": "First name is required",
+  "fieldErrors": {
+    "firstName": "First name is required"
+  }
+}</pre>
+<h3>Why did a 405 happen?</h3>
+<p>HTTP 405 means the URL exists but the selected HTTP method is not allowed there. Employee creation uses <b>POST</b> at <code>/api/employees</code>. PUT and DELETE need an ID, such as <code>/api/employees/4</code>. A wrong method is rejected before first-name validation runs.</p>
+</section>
+
+<section class="page">
+<div class="eyebrow">Java files</div><h2>Application, controller, and DTO files</h2>
+<h3 class="file">EmployeeManagementApplication.java</h3>
+<p>This is the starting point of the Spring Boot app. Its <code>main</code> method starts Spring. <code>@SpringBootApplication</code> tells Spring to configure the app and scan for its controllers, services, repositories, and other components.</p>
+<h3 class="file">EmployeeController.java</h3>
+<p>This file defines the web API. <code>@RestController</code> means its methods return HTTP responses, usually JSON. <code>@RequestMapping("/api/employees")</code> sets the common URL prefix. Each endpoint method delegates real work to <code>EmployeeService</code>.</p>
+<ul><li><code>createEmployee</code>: accepts JSON, validates it, calls the service, and returns status 201.</li><li><code>getAllEmployees</code>: returns the employee list.</li><li><code>getEmployeeById</code>: reads the ID from the URL and returns one employee.</li><li><code>updateEmployee</code>: validates replacement data and updates the selected ID.</li><li><code>deleteEmployee</code>: deletes the selected ID and returns an empty 204 response.</li></ul>
+<p><code>@RequestBody</code> converts JSON into a Java object. <code>@PathVariable</code> reads a value such as <code>4</code> from the URL. <code>@Valid</code> asks Spring to check validation rules.</p>
+<h3 class="file">EmployeeRequest.java</h3>
+<p>This is the input shape for POST and PUT. It keeps incoming data separate from the database object.</p>
+<ul><li><code>firstName</code>, <code>lastName</code>, and <code>department</code>: cannot be null, empty, or just spaces; maximum 100 characters.</li><li><code>email</code>: required, must look like an email, maximum 150 characters.</li><li><code>salary</code>: required and greater than zero.</li></ul>
+<p>Getters and setters let Spring fill in and read the fields from JSON.</p>
+<h3 class="file">EmployeeResponse.java</h3>
+<p>This is the output shape sent back to the client. It contains the generated ID and employee details, with getters and setters so Spring can convert it to JSON. Returning a response DTO avoids exposing the database entity directly.</p>
+</section>
+
+<section class="page">
+<div class="eyebrow">Java files</div><h2>Service, repository, and database entity</h2>
+<h3 class="file">EmployeeService.java</h3>
+<p>This interface lists the operations the app supports: create, read all, read one, update, and delete. It names the work without specifying how it is done. The controller depends on this interface.</p>
+<h3 class="file">EmployeeServiceImpl.java</h3>
+<p>This class implements the service operations. <code>@Service</code> lets Spring create and inject it. <code>@Transactional</code> makes database work run in transactions.</p>
+<table><tr><th>Part</th><th>Plain-language job</th></tr>
+<tr><td><code>toResponse</code></td><td>Copies entity values into the API response DTO.</td></tr>
+<tr><td><code>createEmployee</code></td><td>Trims and lowercases email, checks for duplicates, copies request values into an entity, saves it, and returns the response.</td></tr>
+<tr><td><code>getAllEmployees</code></td><td>Loads all rows and converts each one to a response DTO. It is read-only.</td></tr>
+<tr><td><code>getEmployeeById</code></td><td>Loads one row. If none exists, throws <code>EmployeeNotFoundException</code>.</td></tr>
+<tr><td><code>updateEmployee</code></td><td>Finds the row, checks email uniqueness, updates fields, saves, and returns the response.</td></tr>
+<tr><td><code>deleteEmployee</code></td><td>Finds and deletes the row. A missing ID raises the not-found exception.</td></tr></table>
+<h3 class="file">EmployeeRepository.java</h3>
+<p>This interface connects the service to the database. It extends Spring Data JPA's <code>JpaRepository</code>, which supplies common operations like <code>findAll</code>, <code>findById</code>, <code>save</code>, and <code>delete</code>. Spring creates the implementation at runtime.</p>
+<p><code>existsByEmail</code> and <code>existsByEmailAndIdNot</code> are derived queries. Spring reads their names and builds database checks for duplicate email addresses.</p>
+<h3 class="file">Employee.java</h3>
+<p>This is the database entity. <code>@Entity</code> marks it as a table-backed class, and <code>@Table(name="employees")</code> sets the table name. Its fields are ID, first name, last name, email, department, and salary.</p>
+<ul><li><code>@Id</code> marks the primary key; <code>@GeneratedValue</code> lets MySQL assign it.</li><li><code>@Column(nullable=false)</code> requires a database value; length and decimal settings define storage limits.</li><li>Email is unique, so the database also prevents duplicates.</li><li>The no-argument constructor and getters/setters help JPA load and save this object.</li></ul>
+</section>
+
+<section class="page">
+<div class="eyebrow">Errors and validation</div><h2>Exception files</h2>
+<h3 class="file">GlobalExceptionHandler.java</h3>
+<p><code>@RestControllerAdvice</code> makes this class a central place to turn exceptions into JSON responses. API methods can throw exceptions, and this class converts them into readable HTTP errors.</p>
+<table><tr><th>Handler</th><th>When it runs</th><th>Status</th></tr>
+<tr><td><code>handleNotFound</code></td><td>An employee ID does not exist.</td><td>404 Not Found</td></tr>
+<tr><td><code>handleDuplicate</code></td><td>An email is already in use.</td><td>409 Conflict</td></tr>
+<tr><td><code>handleValidation</code></td><td>A request field fails a DTO rule.</td><td>400 Bad Request</td></tr>
+<tr><td><code>handleMethodNotAllowed</code></td><td>The URL was called using a method it does not accept.</td><td>405 Method Not Allowed</td></tr></table>
+<p>The validation handler puts field names and messages in <code>fieldErrors</code> and joins those messages into <code>message</code>. The method-not-allowed handler reports supported methods when Spring knows them and preserves the HTTP <code>Allow</code> header. The private <code>error</code> helper creates the shared status, error, and message fields for not-found and duplicate-email cases.</p>
+<h3 class="file">EmployeeNotFoundException.java</h3>
+<p>A custom exception used when an employee ID is missing. It carries a message such as “Employee not found with id: 12.” The global handler returns it as a 404 response.</p>
+<h3 class="file">DuplicateEmailException.java</h3>
+<p>A custom exception used when an email is already taken. The global handler returns its message as a 409 response.</p>
+<div class="callout"><b>Remember:</b> A missing first name is checked before the service runs. A duplicate email is checked inside the service after input validation passes.</div>
+</section>
+
+<section class="page">
+<div class="eyebrow">Configuration</div><h2>Settings and Maven files</h2>
+<h3 class="file">application.properties</h3>
+<p>This file holds settings Spring reads when the app starts.</p>
+<ul><li><code>spring.application.name</code>: names the app in logs and tools.</li><li><code>spring.datasource.url</code>: connects to the local MySQL database named <code>employee_db</code>.</li><li><code>DB_USERNAME</code> and <code>DB_PASSWORD</code>: environment variables can override the local defaults.</li><li><code>spring.jpa.hibernate.ddl-auto=update</code>: Hibernate creates or updates the table structure at startup.</li><li><code>spring.jpa.show-sql</code> and <code>format_sql</code>: print readable database statements for development.</li><li><code>server.port=8080</code>: the app listens on port 8080.</li></ul>
+<div class="note">MySQL must be running and <code>employee_db</code> must be available before the app can connect. Keep real passwords out of shared source files.</div>
+<h3 class="file">pom.xml</h3>
+<p>This is Maven's project recipe. It identifies the app, inherits Spring Boot dependency versions from its parent, sets Java 17, and lists required libraries.</p>
+<ul><li>Spring Data JPA: database mapping and repository support.</li><li>Spring Validation: checks rules such as <code>@NotBlank</code>.</li><li>Spring Web MVC: REST endpoints and HTTP/JSON support.</li><li>MySQL Connector/J: connects to MySQL at runtime.</li><li>Spring Boot test starters: test libraries.</li><li>Spring Boot Maven Plugin: packages and runs the Spring Boot app.</li></ul>
+<h3 class="file">.mvn/wrapper/maven-wrapper.properties</h3>
+<p>Chooses the Maven version used by the wrapper. This project uses Maven Wrapper 3.3.4 and Apache Maven 3.9.11. The 3.9.11 choice avoids the Maven 3.10.0 IntelliJ importer issue seen earlier.</p>
+<h3 class="file">mvnw and mvnw.cmd</h3>
+<p>These are Maven Wrapper launchers. <code>mvnw</code> is for macOS/Linux shells; <code>mvnw.cmd</code> is for Windows. They download the configured Maven version if needed, then run Maven. On Windows, from this folder, run <code>.\mvnw.cmd spring-boot:run</code>.</p>
+</section>
+
+<section class="page">
+<div class="eyebrow">Project support files</div><h2>Tests, help, and version-control files</h2>
+<h3 class="file">EmployeeManagementApplicationTests.java</h3>
+<p>This is a Spring Boot context-load test. Its <code>contextLoads</code> test starts the application context and passes if Spring can create its components. Because this app uses MySQL, the test may need a working database configuration.</p>
+<h3 class="file">EmployeeServiceImplTest.java</h3>
+<p>This file currently contains an empty test class. It has no test methods yet, so it does not currently check service behavior.</p>
+<h3 class="file">.gitignore</h3>
+<p>This tells Git which files to leave out when saving project changes. It excludes generated build folders such as <code>target/</code>, IDE settings, and temporary files, keeping machine-specific or generated files out of source control.</p>
+<h3 class="file">.gitattributes</h3>
+<p>This asks Git to keep line endings consistent: the Unix wrapper uses LF, and Windows <code>.cmd</code> files use CRLF. Consistent line endings reduce noisy changes across operating systems.</p>
+<h3 class="file">HELP.md</h3>
+<p>Spring Initializr generated this help file. It links to Maven, Spring Boot, Web MVC, JPA, MySQL, and validation guides. It is documentation, not code needed at runtime.</p>
+<h3>Other folders and files</h3>
+<ul><li><code>target/</code>: generated classes and packaged output from Maven. It can be recreated by building the app, so do not edit it manually.</li><li><code>.idea/</code>: IntelliJ's local project/workspace settings. These are for the editor and do not implement the API.</li><li>No README is present in the app folder; this PDF gives a beginner-friendly project overview.</li></ul>
+<h2>Quick glossary</h2>
+<table><tr><th>Word</th><th>Easy meaning</th></tr>
+<tr><td>API</td><td>A set of URLs and rules another program can use.</td></tr>
+<tr><td>DTO</td><td>A small object used to receive or return data.</td></tr>
+<tr><td>Entity</td><td>A Java object that represents a database row.</td></tr>
+<tr><td>Repository</td><td>The data-access layer that talks to the database.</td></tr>
+<tr><td>Validation</td><td>Checks that incoming values follow rules before saving.</td></tr>
+<tr><td>HTTP status</td><td>A number describing the result: 200 success, 400 invalid input, 404 missing record, 409 duplicate, 405 wrong method.</td></tr></table>
+<div class="callout"><b>Typical create flow:</b> Start MySQL → run <code>.\mvnw.cmd spring-boot:run</code> → send POST in Postman → Spring validates JSON → service checks rules → repository saves it → response JSON comes back.</div>
+<p class="small">End of guide.</p>
+</section>
+</body></html>
